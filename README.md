@@ -3,7 +3,7 @@ pyodata
 
 An OData framework for Python. It will include a full (as much as possible) implementation of the OData Protocol v4.0
 
-While implementing, we will follow the following guidelines:
+## IMPLEMENTATION GUIDELINES
 
 **1.** The implementation must be as generic as possible regarding data sources. The implementation **MUST NOT** be biased towards a certain type of data source (e.g. raw data from a relational DB, entity from an ORM, etc.)
 
