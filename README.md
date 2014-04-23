@@ -3,6 +3,8 @@ pyodata
 
 An OData framework for Python. It will include a full (as much as possible) implementation of the OData Protocol v4.0
 
+A link to OData protocol documentation: http://www.odata.org/documentation/odata-version-4-0/
+
 Current Version: 0.0.0 (Development hasn't started yet)
 
 ## IMPLEMENTATION GUIDELINES
