@@ -25,3 +25,11 @@ Current Version: 0.0.0 (Development hasn't started yet)
 |[SM - Service Model](https://github.com/Terfin/pyodata/issues/2) | Requirements written, review needed |
 | Versioning | Not Started |
 | Extensibility | Not Started |
+| Formats | Not Started |
+| Headers Handling | Not Started |
+| Response Codes | Not Started |
+| Context URL | Not Started |
+| Data Servoce Reqiests support | Not Started |
+| Security | Not Started |
+| Conformance | Not Started |
+
