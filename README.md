@@ -23,7 +23,7 @@ Current Version: 0.0.0 (Development hasn't started yet)
 |--------|--------|
 |[EDM - Entity Data Model](https://github.com/Terfin/pyodata/issues/1) | Requirements written, review needed |
 |[SM - Service Model](https://github.com/Terfin/pyodata/issues/2) | Requirements written, review needed |
-| Versioning | Not Started |
+|[Versioning](https://github.com/Terfin/pyodata/issues/3) | Not Started |
 | Extensibility | Not Started |
 | Formats | Not Started |
 | Headers Handling | Not Started |
