@@ -8,6 +8,7 @@ A link to OData protocol documentation: http://www.odata.org/documentation/odata
 Current Version: 0.0.0 (Development hasn't started yet)
 
 If you happen to visit this repo and wish to help, please see the list of features below (table) and see their respective issue items. Thanks!
+Also, don't hesitate to leave a note regarding anything you see wrong with either the feature requirements, the architecture or the code.
 
 ## IMPLEMENTATION GUIDELINES
 
