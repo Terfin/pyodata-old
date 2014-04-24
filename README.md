@@ -21,6 +21,8 @@ If you happen to visit this repo and wish to help, please see the list of featur
 
 **5.** Keep it simple, address the common cases, keep the option to extend where needed.
 
+**6. No work is to be done on a feature, unless the feature's requirements have been properly documented, reviewed and approved.**
+
 ## Supported Features
 
 |Feature | Status|
