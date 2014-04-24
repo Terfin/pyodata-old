@@ -7,6 +7,8 @@ A link to OData protocol documentation: http://www.odata.org/documentation/odata
 
 Current Version: 0.0.0 (Development hasn't started yet)
 
+If you happen to visit this repo and wish to help, please see the list of features below (table) and see their respective issue items. Thanks!
+
 ## IMPLEMENTATION GUIDELINES
 
 **1.** The implementation must be as generic as possible regarding data sources. The implementation **MUST NOT** be biased towards a certain type of data source (e.g. raw data from a relational DB, entity from an ORM, etc.)
