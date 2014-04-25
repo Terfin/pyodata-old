@@ -38,11 +38,13 @@ Also, don't hesitate to leave a note regarding anything you see wrong with eithe
 
 &nbsp;&nbsp;&nbsp;&nbsp;**c.** Component testing and critical bug fixes.
 
-&nbsp;&nbsp;&nbsp;&nbsp;**d.** System and regression testing and fixing critical bugs.
+&nbsp;&nbsp;&nbsp;&nbsp;**d.** Integration testing and critical bug fixes.
 
-&nbsp;&nbsp;&nbsp;&nbsp;**e.** System of systems testing and regression testing (Of the entire framework) and fix critical bugs.
+&nbsp;&nbsp;&nbsp;&nbsp;**e.** System and regression testing and fixing critical bugs.
 
-&nbsp;&nbsp;&nbsp;&nbsp;**f.** Release. (alpha, beta, RC or final)
+&nbsp;&nbsp;&nbsp;&nbsp;**f.** System of systems testing and regression testing (Of the entire framework) and fix critical bugs.
+
+&nbsp;&nbsp;&nbsp;&nbsp;**g.** Release. (alpha, beta, RC or final)
 
 &nbsp;&nbsp;&nbsp;&nbsp;Of course each testing-fixing phase will be executed over and over again until it passes.
 
