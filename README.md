@@ -31,16 +31,22 @@ Also, don't hesitate to leave a note regarding anything you see wrong with eithe
 **2.** Test your code with unit tests. If you feel comfortable with TDD, you may use it instead of regular development.
 
 **3.** Development Cycles will be in the following order (Assuming feature has been designed):
+
 &nbsp;&nbsp;&nbsp;&nbsp;**a.** Coding -> unit testing -> Fixing. (Or use TDD instead)
+
 &nbsp;&nbsp;&nbsp;&nbsp;**b.** Code review. (Everyone can review everyone's code) and ciritcal bug fixes.
+
 &nbsp;&nbsp;&nbsp;&nbsp;**c.** Component testing and critical bug fixes.
+
 &nbsp;&nbsp;&nbsp;&nbsp;**d.** System and regression testing and fixing critical bugs.
+
 &nbsp;&nbsp;&nbsp;&nbsp;**e.** System of systems testing and regression testing (Of the entire framework) and fix critical bugs.
+
 &nbsp;&nbsp;&nbsp;&nbsp;**f.** Release. (alpha, beta, RC or final)
 
-Of course each testing-fixing phase will be executed over and over again until it passes.
+&nbsp;&nbsp;&nbsp;&nbsp;Of course each testing-fixing phase will be executed over and over again until it passes.
 
-4. Each feature will have its own version code and will be treated as a system. The entire framework will have its own version code.
+**4.** Each feature will have its own version code and will be treated as a system. The entire framework will have its own version code.
 
 ## Supported Features
 
