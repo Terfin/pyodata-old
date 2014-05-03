@@ -54,7 +54,7 @@ Also, don't hesitate to leave a note regarding anything you see wrong with eithe
 
 |Feature | Status|
 |--------|--------|
-|[EDM - Entity Data Model](https://github.com/Terfin/pyodata/issues/1) | Design |
+|[EDM - Entity Data Model](https://github.com/Terfin/pyodata/issues/1) | Coding |
 |[SM - Service Model](https://github.com/Terfin/pyodata/issues/2) | Requirements written, review needed |
 |[Versioning](https://github.com/Terfin/pyodata/issues/3) | Requirements written, review needed |
 | Extensibility | Not Started |
