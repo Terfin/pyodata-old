@@ -5,7 +5,7 @@ An OData framework for Python. It will include a full (as much as possible) impl
 
 A link to OData protocol documentation: http://www.odata.org/documentation/odata-version-4-0/
 
-Current Version: 0.0.0.0 (Development hasn't started yet)
+Current Version: 0.0.0.1
 
 If you happen to visit this repo and wish to help, please see the list of features below (table) and see their respective issue items. Thanks!
 Also, don't hesitate to leave a note regarding anything you see wrong with either the feature requirements, the architecture or the code.
