@@ -134,9 +134,9 @@ regex_base['int16Value'] = '(?:{SIGN}{{0,1}}{DIGIT}{{1,5}})'.format(**regex_base
 regex_base['int32Value'] = '(?:{SIGN}{{0,1}}{DIGIT}{{1,10}})'.format(**regex_base)
 regex_base['int64Value'] = '(?:{SIGN}{{0,1}}{DIGIT}{{1,19}})'.format(**regex_base)
 regex_base['SQUOTE-in-string'] = '{0}{0}'.format(regex_base['SQUOTE'])
-regex_base['string'] = '(?:{SQUOTE}(?:{SQUOTE-in-string}|{pchar-no-SQUOTE})*{SQUOTE})'.format(**regex_base)
+regex_base['string'] = '(?:(?:{SQUOTE-in-string}|{pchar-no-SQUOTE})*)'.format(**regex_base)
 regex_base['dateValue'] = '(?:{year}\-{month}\-{day})'.format(**regex_base)
-regex_base['dateTimeOffsetValue'] = '(?:{year}\-{month}\-{day}T{hour}:{minute}(?:{second}(?:\.{fractionalSeconds}){{0,1}}){{0,1}})'.format(**regex_base)
+regex_base['datetimeoffsetValue'] = '(?:{year}\-{month}\-{day}T{hour}:{minute}(?:{second}(?:\.{fractionalSeconds}){{0,1}}){{0,1}})'.format(**regex_base)
 regex_base['enumMemberValue'] = regex_base['int64Value']
 regex_base['singleEnumValue'] = '(?:{enumerationMember}|{enumMemberValue})'.format(**regex_base)
 regex_base['enumValue'] = '(?:{singleEnumValue}(?:{COMMA}{singleEnumValue})*)'.format(**regex_base)
@@ -146,41 +146,41 @@ regex_base['positionLiteral'] = '(?:{doubleValue}{SP}{doubleValue})'.format(**re
 regex_base['lineStringData'] = '(?:{OPEN}{positionLiteral}(?:{COMMA}{positionLiteral})*{CLOSE})'.format(**regex_base)
 regex_base['lineStringLiteral'] = '(?:LineString{})'.format(regex_base['lineStringData'])
 regex_base['fullLineStringLiteral'] = '(?:{sridLiteral}{lineStringLiteral})'.format(**regex_base)
-regex_base['geographyLineString'] = '(?:{geographyPrefix}{SQUOTE}{fullLineStringLiteral}{SQUOTE})'.format(**regex_base)
+regex_base['geographylinestring'] = '(?:{geographyPrefix}{SQUOTE}{fullLineStringLiteral}{SQUOTE})'.format(**regex_base)
 regex_base['multiLineStringLiteral'] = '(?:MultiLineString\((?:{lineStringData}(?:{COMMA}{lineStringData})*){{0,1}}{CLOSE})'.format(**regex_base)
 regex_base['fullMultiLineStringLiteral'] = '(?:{sridLiteral}{multiLineStringLiteral})'.format(**regex_base)
-regex_base['geographyMultiLineString'] = '(?:{geographyPrefix}{SQUOTE}{fullMultiLineStringLiteral}{SQUOTE})'.format(**regex_base)
+regex_base['geographymultilinestring'] = '(?:{geographyPrefix}{SQUOTE}{fullMultiLineStringLiteral}{SQUOTE})'.format(**regex_base)
 regex_base['pointData'] = '(?:{OPEN}{positionLiteral}{CLOSE})'.format(**regex_base)
 regex_base['pointLiteral'] = '(?:Point{})'.format(regex_base['pointData'])
 regex_base['fullPointLiteral'] = '(?:{sridLiteral}{pointLiteral})'.format(**regex_base)
-regex_base['geographyPoint'] = '(?:{geographyPrefix}{SQUOTE}{fullPointLiteral}{SQUOTE})'.format(**regex_base)
+regex_base['geographypoint'] = '(?:{geographyPrefix}{SQUOTE}{fullPointLiteral}{SQUOTE})'.format(**regex_base)
 regex_base['multiPointLiteral'] = '(?:MultiPoint\((?:{pointData}(?:{COMMA}{pointData})*){{0,1}}{CLOSE})'.format(**regex_base)
 regex_base['fullMultiPointLiteral'] = '(?:{sridLiteral}{multiPointLiteral})'.format(**regex_base)
-regex_base['geographyMultiPoint'] = '(?:{geographyPrefix}{SQUOTE}{fullMultiPointLiteral}{SQUOTE})'.format(**regex_base)
+regex_base['geographymultipoint'] = '(?:{geographyPrefix}{SQUOTE}{fullMultiPointLiteral}{SQUOTE})'.format(**regex_base)
 regex_base['ringLiteral'] = '(?:{OPEN}{positionLiteral}(?:{COMMA}{positionLiteral})*{CLOSE})'.format(**regex_base)
 regex_base['polygonData'] = '(?:{OPEN}{ringLiteral}(?:{COMMA}{ringLiteral})*{CLOSE})'.format(**regex_base)
 regex_base['polygonLiteral'] = '(?:Polygon{})'.format(regex_base['polygonData'])
 regex_base['fullPolygonLiteral'] = '(?:{sridLiteral}{polygonLiteral})'.format(**regex_base)
-regex_base['geographyPolygon'] = '(?:{geographyPrefix}{SQUOTE}{fullPolygonLiteral}{SQUOTE})'.format(**regex_base)
+regex_base['geographypolygon'] = '(?:{geographyPrefix}{SQUOTE}{fullPolygonLiteral}{SQUOTE})'.format(**regex_base)
 regex_base['multiPolygonLiteral'] = '(?:MultiPolygon\((?:{polygonData}(?:{COMMA}{polygonData})*){{0,1}}{CLOSE})'.format(**regex_base)
 regex_base['fullMultiPolygonLiteral'] = '(?:{sridLiteral}{multiPolygonLiteral})'.format(**regex_base)
-regex_base['geographyMultiPolygon'] = '(?:{geographyPrefix}{SQUOTE}{fullMultiPolygonLiteral}{SQUOTE})'.format(**regex_base)
+regex_base['geographymultipolygon'] = '(?:{geographyPrefix}{SQUOTE}{fullMultiPolygonLiteral}{SQUOTE})'.format(**regex_base)
 regex_base['geoLiteral'] = '(?:{lineStringLiteral}|{multiPointLiteral}|{multiLineStringLiteral}|{multiPolygonLiteral}|{pointLiteral}|{polygonLiteral})'.format(**regex_base)
 regex_base['collectionLiteral'] = '(?:Collection\({geoLiteral}(?:{COMMA}{geoLiteral})*{CLOSE})'.format(**regex_base)
 regex_base['fullGeoLiteral'] = '(?:{collectionLiteral}|{geoLiteral})'.format(**regex_base)
 regex_base['collectionOfCollectionLiteral'] = '(?:Collection\({fullGeoLiteral}(?:{COMMA}{fullGeoLiteral})*{CLOSE})'.format(**regex_base)
 regex_base['fullCollectionLiteral'] = '(?:{sridLiteral}(?:{collectionOfCollectionLiteral}|{geoLiteral}))'.format(**regex_base)
-regex_base['geographyCollection'] = '(?:{geographyPrefix}{SQUOTE}{fullCollectionLiteral}{SQUOTE})'.format(**regex_base)
-regex_base['primitiveValue'] = '(?:{booleanValue}|{guidValue}|{durationValue}|{dateValue}|{dateTimeOffsetValue}|{timeOfDayValue}|{enumValue}|{fullCollectionLiteral}|{fullLineStringLiteral}|{fullMultiPointLiteral}|{fullMultiLineStringLiteral}|{fullPolygonLiteral}|{fullPointLiteral}|{fullPolygonLiteral}|{decimalValue}|{doubleValue}|{singleValue}|{sbyteValue}|{byteValue}|{int16Value}|{int32Value}|{int64Value}|{binaryValue})'.format(**regex_base)
-regex_base['geometryCollection']= '(?:{geometryPrefix}{SQUOTE}{fullCollectionLiteral}{SQUOTE})'.format(**regex_base)
-regex_base['geometryLineString']= '(?:{geometryPrefix}{SQUOTE}{fullLineStringLiteral}{SQUOTE})'.format(**regex_base)
-regex_base['geometryMultiLineString']= '(?:{geometryPrefix}{SQUOTE}{fullMultiLineStringLiteral}{SQUOTE})'.format(**regex_base)
-regex_base['geometryMultiPoint']= '(?:{geometryPrefix}{SQUOTE}{fullMultiPointLiteral}{SQUOTE})'.format(**regex_base)
-regex_base['geometryMultiPolygon']= '(?:{geometryPrefix}{SQUOTE}{fullMultiPolygonLiteral}{SQUOTE})'.format(**regex_base)
-regex_base['geometryPoint']= '(?:{geometryPrefix}{SQUOTE}{fullPointLiteral}{SQUOTE})'.format(**regex_base)
-regex_base['geometryPolygon']= '(?:{geometryPrefix}{SQUOTE}{fullPolygonLiteral}{SQUOTE})'.format(**regex_base)
+regex_base['geographycollection'] = '(?:{geographyPrefix}{SQUOTE}{fullCollectionLiteral}{SQUOTE})'.format(**regex_base)
+regex_base['primitiveValue'] = '(?:{booleanValue}|{guidValue}|{durationValue}|{dateValue}|{datetimeoffsetValue}|{timeOfDayValue}|{enumValue}|{fullCollectionLiteral}|{fullLineStringLiteral}|{fullMultiPointLiteral}|{fullMultiLineStringLiteral}|{fullPolygonLiteral}|{fullPointLiteral}|{fullPolygonLiteral}|{decimalValue}|{doubleValue}|{singleValue}|{sbyteValue}|{byteValue}|{int16Value}|{int32Value}|{int64Value}|{binaryValue})'.format(**regex_base)
+regex_base['geometrycollection']= '(?:{geometryPrefix}{SQUOTE}{fullCollectionLiteral}{SQUOTE})'.format(**regex_base)
+regex_base['geometrylinestring']= '(?:{geometryPrefix}{SQUOTE}{fullLineStringLiteral}{SQUOTE})'.format(**regex_base)
+regex_base['geometrymultilinestring']= '(?:{geometryPrefix}{SQUOTE}{fullMultiLineStringLiteral}{SQUOTE})'.format(**regex_base)
+regex_base['geometrymultipoint']= '(?:{geometryPrefix}{SQUOTE}{fullMultiPointLiteral}{SQUOTE})'.format(**regex_base)
+regex_base['geometrymultipolygon']= '(?:{geometryPrefix}{SQUOTE}{fullMultiPolygonLiteral}{SQUOTE})'.format(**regex_base)
+regex_base['geometrypoint']= '(?:{geometryPrefix}{SQUOTE}{fullPointLiteral}{SQUOTE})'.format(**regex_base)
+regex_base['geometrypolygon']= '(?:{geometryPrefix}{SQUOTE}{fullPolygonLiteral}{SQUOTE})'.format(**regex_base)
 regex_base['duration'] = '(?:duration{SQUOTE}{durationValue}{SQUOTE})'.format(**regex_base)
-regex_base['primitiveLiteral'] = '(?:{nullValue}|{booleanValue}|{guidValue}|{dateValue}|{dateTimeOffsetValue}|{timeOfDayValue}|{decimalValue}|{doubleValue}|{singleValue}|{sbyteValue}|{byteValue}|{int16Value}|{int32Value}|{int64Value}|{string}|{duration}|{binary}|{enum}|{geographyCollection}|{geographyLineString}|{geographyMultiLineString}|{geographyMultiPoint}|{geographyMultiPolygon}|{geographyPoint}|{geographyPolygon}|{geometryCollection}|{geometryLineString}|{geometryMultiLineString}|{geometryMultiPoint}|{geometryMultiPolygon}|{geometryPoint}|{geometryPolygon})'.format(**regex_base)
+regex_base['primitiveLiteral'] = '(?:{nullValue}|{booleanValue}|{guidValue}|{dateValue}|{datetimeoffsetValue}|{timeOfDayValue}|{decimalValue}|{doubleValue}|{singleValue}|{sbyteValue}|{byteValue}|{int16Value}|{int32Value}|{int64Value}|{string}|{duration}|{binary}|{enum}|{geographycollection}|{geographylinestring}|{geographymultilinestring}|{geographymultipoint}|{geographymultipolygon}|{geographypoint}|{geographypolygon}|{geometrycollection}|{geometrylinestring}|{geometrymultilinestring}|{geometrymultipoint}|{geometrymultipolygon}|{geometrypoint}|{geometrypolygon})'.format(**regex_base)
 regex_base['entityFunctionImport'] = regex_base['odataIdentifier']
 regex_base['entityColFunctionImport'] = regex_base['odataIdentifier']
 regex_base['complexFunctionImport'] = regex_base['odataIdentifier']
@@ -240,43 +240,37 @@ regex_base['numberInJSON'] = '(?:\-{{0,1}}{int}{frac}{{0,1}}{exp}{{0,1}})'.forma
 # regex_base['singleNavigationExpr'] = '(?:\/{memberExpr})'
 # regex_base['rootExpr'] = '(?:$root/(?:{entitySetName}(?:{keyPredicate}|{singletonEntity}){}{{0,1}}))'
 
-parsing_base = {
-    'ALPHA': Word(alphas, exact=1),
-    'DIGIT': Word(nums, exact=1),
-    'A-to-F': Word(hexnums, exact=1),
-    'DQUOTE': Word('%x22', exact=1),
-    'SP': Word('%x20', exact=1),
-    'HTAB': Word('%x09', exact=1),
-    'VCHAR': Word(srange('[%x21-7E]'), exact=1),
-    'COLON': Word(':', exact=1),
-    'DCOLON': Word(':', exact=2)
-}
-parsing_base['HEXDIG'] = Word(hexnums, exact=1)
-parsing_base['scheme'] = Combine(parsing_base['ALPHA'] + ZeroOrMore(parsing_base['ALPHA'] | parsing_base['DIGIT'] | '+' | '-' | '.'))
-parsing_base['port'] = Combine(ZeroOrMore(parsing_base['DIGIT']))
-parsing_base['h16'] = Combine(parsing_base['HEXDIG'] + And([Optional(parsing_base['HEXDIG'])]*3))
-parsing_base['dec-octet'] = (Combine('1'+And(parsing_base['DIGIT']*2) | ('2' + Word(srange('[%x30-34]'), exact=1)+parsing_base['DIGIT'])|('25'+Word(srange('[%x30-35]'),exact=1))|(Word(srange('[%x31-39]'),exact=1) + parsing_base['DIGIT'])|parsing_base['DIGIT']))
-parsing_base['IPv4address'] = Combine(And([parsing_base['dec-octet']+'.']*3) + parsing_base['dec-octet'])
-parsing_base['ls32'] = Combine((parsing_base['h16'] + ':' + parsing_base['h16'])|parsing_base['IPv4address'])
-parsing_base['IPv6address'] = Combine(
-    (And([parsing_base['h16'] + ':']*6) + parsing_base['ls32'])|
-    ('::'+And([parsing_base['h16'] + ':']*5) + parsing_base['ls32'])|
-    (Optional(parsing_base['h16']) +'::'+And([parsing_base['h16'] + ':']*4) + parsing_base['ls32'])|
-    (Optional(Optional(parsing_base['h16'] + ':') + parsing_base['h16']) +'::'+And([parsing_base['h16'] + ':']*3) + parsing_base['ls32'])|
-    (Optional(Optional(And([Optional(parsing_base['h16'] + ':')]*2)) + parsing_base['h16']) +'::'+And([parsing_base['h16'] + ':']*2) + parsing_base['ls32'])|
-    (Optional(Optional(And([Optional(parsing_base['h16'] + ':')]*3)) + parsing_base['h16']) +'::'+ (parsing_base['h16'] + ':') + parsing_base['ls32'])|
-    (Optional(Optional(And([Optional(parsing_base['h16'] + ':')]*4)) + parsing_base['h16']) +'::'+ parsing_base['ls32'])|
-    (Optional(Optional(And([Optional(parsing_base['h16'] + ':')]*5)) + parsing_base['h16']) +'::'+ parsing_base['h16'])|
-    (Optional(Optional(And([Optional(parsing_base['h16'] + ':')]*6)) + parsing_base['h16']) +'::')
-            )
-a = Optional(Optional(And([Optional(parsing_base['h16'] + ':')]*6)) + parsing_base['h16']) + '::'
-b = ((parsing_base['h16'] + parsing_base['COLON'])*(0,6))*(0,1) + parsing_base['h16'] + parsing_base['DCOLON']
-hexdig = Word(hexnums, exact=1)
-h16 = Combine(hexdig + And([Optional(hexdig)]*4))
-ipv6 = Optional(Optional(And([Optional(h16 + Literal(':'))]*6)) + FollowedBy(h16)) + FollowedBy(Literal('::'))
-print ipv6.parseString('ABAF::')
-test = Optional(Optional(And([Optional(h16 + ':')]*6)) + h16)
-print test.parseString('ABAF')
-print a.parseString('::')
+# parsing_base = {
+#     'ALPHA': Word(alphas, exact=1),
+#     'DIGIT': Word(nums, exact=1),
+#     'A-to-F': Word(hexnums, exact=1),
+#     'DQUOTE': Word('%x22', exact=1),
+#     'SP': Word('%x20', exact=1),
+#     'HTAB': Word('%x09', exact=1),
+#     'VCHAR': Word(srange('[%x21-7E]'), exact=1),
+#     'COLON': Word(':', exact=1),
+#     'DCOLON': Word(':', exact=2)
+# }
+# parsing_base['HEXDIG'] = Word(hexnums, exact=1)
+# parsing_base['scheme'] = Combine(parsing_base['ALPHA'] + ZeroOrMore(parsing_base['ALPHA'] | parsing_base['DIGIT'] | '+' | '-' | '.'))
+# parsing_base['port'] = Combine(ZeroOrMore(parsing_base['DIGIT']))
+# parsing_base['h16'] = Combine(parsing_base['HEXDIG']*(1,4))
+# parsing_base['dec-octet'] = (Combine(('1' + parsing_base['DIGIT']*2) | ('2' + Word(srange('[%x30-34]'), exact=1)+parsing_base['DIGIT'])|('25'+Word(srange('[%x30-35]'),exact=1))|(Word(srange('[%x31-39]'),exact=1) + parsing_base['DIGIT'])|parsing_base['DIGIT']))
+# parsing_base['IPv4address'] = Combine(And([parsing_base['dec-octet']+'.']*3) + parsing_base['dec-octet'])
+# parsing_base['ls32'] = Combine((parsing_base['h16'] + ':' + parsing_base['h16'])|parsing_base['IPv4address'])
+# parsing_base['IPv6address'] = Combine(
+#     (And([parsing_base['h16'] + ':']*6) + parsing_base['ls32'])|
+#     ('::'+And([parsing_base['h16'] + ':']*5) + parsing_base['ls32'])|
+#     (Optional(parsing_base['h16']) +'::'+And([parsing_base['h16'] + ':']*4) + parsing_base['ls32'])|
+#     (Optional(Optional(parsing_base['h16'] + ':') + parsing_base['h16']) +'::'+And([parsing_base['h16'] + ':']*3) + parsing_base['ls32'])|
+#     (Optional(Optional(And([Optional(parsing_base['h16'] + ':')]*2)) + parsing_base['h16']) +'::'+And([parsing_base['h16'] + ':']*2) + parsing_base['ls32'])|
+#     (Optional(Optional(And([Optional(parsing_base['h16'] + ':')]*3)) + parsing_base['h16']) +'::'+ (parsing_base['h16'] + ':') + parsing_base['ls32'])|
+#     (Optional(Optional(And([Optional(parsing_base['h16'] + ':')]*4)) + parsing_base['h16']) +'::'+ parsing_base['ls32'])|
+#     (Optional(Optional(And([Optional(parsing_base['h16'] + ':')]*5)) + parsing_base['h16']) +'::'+ parsing_base['h16'])|
+#     (Optional(Optional(And([Optional(parsing_base['h16'] + ':')]*6)) + parsing_base['h16']) +'::')
+#             )
+# a = Optional((parsing_base['h16'] + Literal(':'))*(0,6) + parsing_base['h16']) - Literal('::')
+# b = ((parsing_base['h16'] + parsing_base['COLON'])*(0,6))*(0,1) + parsing_base['h16'] + parsing_base['DCOLON']
 
-debug.set_trace()
+
+# debug.set_trace()

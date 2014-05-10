@@ -3,6 +3,8 @@ from abc import ABCMeta, abstractproperty, abstractmethod
 from pdb import Pdb
 from lxml import etree as ET
 from lxml import objectify
+from ..utils import regex_base
+import re
 
 debugger = Pdb()
 
@@ -14,51 +16,27 @@ numeric_ranges = {
 	'Double': { '_maxval': 1.7 * 10 ** 307, '_minval': -1.7 * 10 ** 307 }
 }
 
-formats_table = {
-	'Time': ('%H:%M:%SZ', '%H:%M:%S-%H:%M', '%H:%M:%S+%H:%M')
-	'DateTimeOffset': ('%Y:%m:%dT%H:%M:%SZ', '%Y:%m:%dT%H:%M:%S-%H:%M', '%Y:%m:%dT%H:%M:%S+%H:%M'),
-}
-
-regex_table = {
-	'Int16': r'^((\+|%2b|\-)){0,1}[0-9]{1,5}$',
-	'Int32': r'^((\+|%2b|\-)){0,1}[0-9]{1,10}$',
-	'Int64': r'^((\+|%2b|\-)){0,1}[0-9]{1,19}$',
-	'Binary': r'^(([-A-Z_a-z0-9]{4,4})*(([-A-Z_a-z0-9]{2,2}([AaEeIiMmQqUuYyCcGgKkOoSsWw]|0|4|8)(\=){0,1})|([-A-Z_a-z0-9][AaQqGgWw](\=\=){0,1})){0,1})$',
-	'Boolean': r'^([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee])$',
-	'Byte': r'^[0-9]{1,3}$',
-	'DateTimeOffset': r'^(((\-){0,1}(0[0-9]{3,3}|(1|2|3|4|5|6|7|8|9)[0-9]{3,}))\-(0(1|2|3|4|5|6|7|8|9)|1(0|1|2))\-(0(1|2|3|4|5|6|7|8|9)|(1|2)[0-9]|3(0|1))[Tt]((0|1)[0-9]|2(1|2|3))\:((0|1|2|3|4|5)[0-9])(\:((0|1|2|3|4|5)[0-9])(\.[0-9]{1,12}){0,1}){0,1}([Zz]|(\+|%2[Bb]|\-)((0|1)[0-9]|2(1|2|3))\:((0|1|2|3|4|5)[0-9])))$',
-	'Decimal': r'^((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}$',
-	'Double': r'^(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff]))$',
-	'Single': r'^(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff]))$',
-	'Guid': r'^[0-9A-Fa-f]{8,8}\-[0-9A-Fa-f]{4,4}\-[0-9A-Fa-f]{4,4}\-[0-9A-Fa-f]{4,4}\-[0-9A-Fa-f]{12,12}$',
-	'SByte': r'^((\+|%2[Bb]|\-)){0,1}[0-9]{1,3}$',
-	'Time': r'^((0|1)[0-9]|2(1|2|3))\:((0|1|2|3|4|5)[0-9])(\:((0|1|2|3|4|5)[0-9])(\.[0-9]{1,12}){0,1}){0,1}$',
-	'Date': r'^((\-){0,1}(0[0-9]{3,3}|(1|2|3|4|5|6|7|8|9)[0-9]{3,}))\-(0(1|2|3|4|5|6|7|8|9)|1(0|1|2))\-(0(1|2|3|4|5|6|7|8|9)|(1|2)[0-9]|3(0|1))$',
-	'GeographyPoint': r'^[Gg][Ee][Oo][Gg][Rr][Aa][Pp][Hh][Yy]('|%27)[Ss][Rr][Ii][Dd]\=[0-9]{1,5}(;|%3[Bb])[Pp][Oo][Ii][Nn][Tt](\(|%28)(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][FfIi][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][FfIi][Nn][Ff]))(\)|%29)('|%27)$',
-	'GeographyLineString': r"^[Gg][Ee][Oo][Gg][Rr][Aa][Pp][Hh][Yy]('|%27)[Ss][Rr][Ii][Dd]\=[0-9]{1,5}(;|%3[Bb])[Ll][Ii][Nn][Ee][Ss][Tt][Rr][Ii][Nn][Gg](\(|%28)(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff]))((,|%2[Cc])(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][FfIi][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][FfIi][Nn][Ff])))+(\)|%29)('|%27)$",
-	'GeographyPolygon': r"^[Gg][Ee][Oo][Gg][Rr][Aa][Pp][Hh][Yy]('|%27)[Ss][Rr][Ii][Dd]\=[0-9]{1,5}(;|%3[Bb])[Pp][Oo][Ll][Yy][Gg][Oo][Nn](\(|%28)(\(|%28)(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff]))((,|%2[Cc])(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])))*(\)|%29)((,|%2[Cc])(\(|%28)(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff]))((,|%2[Cc])(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])))*(\)|%29))*(\)|%29)('|%27)$",
-	'GeographyMultiPoint': r"^[Gg][Ee][Oo][Gg][Rr][Aa][Pp][Hh][Yy]('|%27)[Ss][Rr][Ii][Dd]\=[0-9]{1,5}(;|%3[Bb])[Mm][Uu][Ll][Tt][Ii][Pp][Oo][Ii][Nn][Tt]\(((\(|%28)(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff]))(\)|%29)((,|%2[Cc])(\(|%28)(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff]))(\)|%29))*){0,1}(\)|%29)('|%27)$",
-	'GeographyMultiLineString': r"^[Gg][Ee][Oo][Gg][Rr][Aa][Pp][Hh][Yy]('|%27)[Ss][Rr][Ii][Dd]\=[0-9]{1,5}(;|%3[Bb])[Mm][Uu][Ll][Tt][Ii][Ll][Ii][Nn][Ee][Ss][Tt][Rr][Ii][Nn][Gg]\(((\(|%28)(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff]))((,|%2[Cc])(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])))+(\)|%29)((,|%2[Cc])(\(|%28)(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff]))((,|%2[Cc])(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])))+(\)|%29))*){0,1}(\)|%29)('|%27)$",
-	'GeographyMultiPolygon': r"^[Gg][Ee][Oo][Gg][Rr][Aa][Pp][Hh][Yy]('|%27)[Ss][Rr][Ii][Dd]\=[0-9]{1,5}(;|%3[Bb])[Mm][Uu][Ll][Tt][Ii][Pp][Oo][Ll][Yy][Gg][Oo][Nn]\(((\(|%28)(\(|%28)(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff]))((,|%2[Cc])(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])))*(\)|%29)((,|%2[Cc])(\(|%28)(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff]))((,|%2[Cc])(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])))*(\)|%29))*(\)|%29)((,|%2[Cc])(\(|%28)(\(|%28)(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff]))((,|%2[Cc])(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])))*(\)|%29)((,|%2[Cc])(\(|%28)(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff]))((,|%2[Cc])(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])))*(\)|%29))*(\)|%29))*){0,1}(\)|%29)('|%27)$",
-	'GeographyCollection': r"^[Gg][Ee][Oo][Gg][Rr][Aa][Pp][Hh][Yy]('|%27)[Ss][Rr][Ii][Dd]\=[0-9]{1,5}(;|%3[Bb])[Cc][Oo][Ll][Ll][Ee][Cc][Tt][Ii][Oo][Nn]\(([Pp][Oo][Ii][Nn][Tt](\(|%28)(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][FfIi][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][FfIi][Nn][Ff]))(\)|%29))|([Ll][Ii][Nn][Ee][Ss][Tt][Rr][Ii][Nn][Gg](\(|%28)(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff]))((,|%2[Cc])(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][FfIi][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][FfIi][Nn][Ff])))+(\)|%29))|([Pp][Oo][Ll][Yy][Gg][Oo][Nn](\(|%28)(\(|%28)(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff]))((,|%2[Cc])(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])))*(\)|%29)((,|%2[Cc])(\(|%28)(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff]))((,|%2[Cc])(((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])) (((\+|%2[Bb]|\-)){0,1}[0-9]+(\.[0-9]+){0,1}([Ee]((\+|%2[Bb]|\-)){0,1}[0-9]+){0,1}|([Nn][Aa][Nn]|\-[Ii][Nn][Ff]|\+[Ii][Nn][Ff])))*(\)|%29))*(\)|%29))|()\)('|%27)$"
-}
-
 class UnknownFacetError(AttributeError):
 	pass
 
 class _EDMElement(type):
 	def __init__(cls, clsname, bases, _dict):
 		setattr(cls, '__edmtype__', "".join(["EDM.", clsname]))
-		if not hasattr(cls, '__regex__'):
-			setattr(cls, '__format__', value)
+		reg_clsname = clsname.lower() + 'Value'
+		if reg_clsname in regex_base:
+			setattr(cls, '__regex__', re.compile(regex_base[reg_clsname]))
+		elif clsname.lower() in regex_base:
+			setattr(cls, '__regex__', re.compile(regex_base[clsname.lower()]))
+		else:
+			setattr(cls, '__regex__', re.compile('.*'))
 		type.__init__(cls, clsname, bases, _dict)
+
 
 class _EDMNumberElement(_EDMElement):
 	def __init__(cls, clsname, bases, _dict):
 		if numeric_ranges.has_key(clsname):
 			setattr(cls, '_maxval', numeric_ranges[clsname]['_maxval'])
 			setattr(cls, '_minval', numeric_ranges[clsname]['_minval'])
-			setattr(cls, '__regex__', '[-][0-9]+')
 		_EDMElement.__init__(cls, clsname, bases, _dict)
 
 class _PrimitiveType(object):
@@ -70,7 +48,7 @@ class _PrimitiveType(object):
 		self.facets = {}
 		self.facets['Name'] = str(name)
 		self.meta_node.attrib['Name'] = str(name)
-		self.meta_node.attrib['EDMType'] = self.__edmEDMType__
+		self.meta_node.attrib['EDMType'] = self.__edmtype__
 		for k,v in facets.items():
 			if k in self.__facets__:
 				self.facets[k] = v
@@ -84,7 +62,7 @@ class _PrimitiveType(object):
 
 
 class _Number(_PrimitiveType):
-	__metaclass__ = _EDMWholeNumberElement
+	__metaclass__ = _EDMNumberElement
 	def __init__(self, name, **facets):
 		super(_Number, self).__init__(name, **facets)
 
@@ -93,6 +71,8 @@ class _Stream(_PrimitiveType):
 		self.__facets__.append('MaxLength')
 		self.__facets__.append('FixedLength')
 		super(_Stream, self).__init__(name, **facets)
+
+
 
 class String(_Stream):
 	def __init__(self, name, **facets):
@@ -266,5 +246,11 @@ class GeometryCollection(Geometry):
 		super(GeometryCollection, self).__init__(name, **facets)
 
 
-__all__ = ['String']
-debugger.set_trace()
+__all__ = ['String', 'Null', 'Binary', 'Boolean', 'Byte', 'DateTimeOffset',
+			'Decimal', 'Double', 'Single', 'Guid', 'Int16', 'Int32', 'Int64', 
+			'SByte', 'Time', 'Date', 'GeographyPoint', 'GeographyLineString',
+			'GeographyPolygon', 'GeographyMultiLineString', 
+			'GeographyMultiPolygon', 'GeographyCollection', 'GeometryPoint',
+			'GeometryLineString', 'GeometryPolygon', 'GeometryMultiPoint',
+			'GeometryMultiLineString', 'GeometryMultiPolygon', 'GeometryCollection'
+			]
