@@ -43,6 +43,7 @@ class _PrimitiveType(object):
 	__facets__ = ['Nullable', 'Name', 'ConcurrencyMode']
 	__meta_node__ = ET.Element('Property')
 	__metaclass__ = _EDMElement
+	key_valid = True
 
 	def __init__(self, name, **facets):
 		self.facets = {}
@@ -165,6 +166,7 @@ class Date(_PrimitiveType):
 
 
 class Geography(_PrimitiveType):
+	key_valid = False
 	def __init__(self, name, **facets):
 		self.__facets__.append('SRID')
 		super(Geography, self).__init__(name, **facets)
@@ -206,6 +208,7 @@ class GeographyCollection(Geography):
 
 
 class Geometry(_PrimitiveType):
+	key_valid = False
 	def __init__(self, name, **facets):
 		self.__facets__.append('SRID')
 		super(Geometry, self).__init__(name, **facets)
