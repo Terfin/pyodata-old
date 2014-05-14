@@ -271,6 +271,3 @@ regex_base['numberInJSON'] = '(?:\-{{0,1}}{int}{frac}{{0,1}}{exp}{{0,1}})'.forma
 #             )
 # a = Optional((parsing_base['h16'] + Literal(':'))*(0,6) + parsing_base['h16']) - Literal('::')
 # b = ((parsing_base['h16'] + parsing_base['COLON'])*(0,6))*(0,1) + parsing_base['h16'] + parsing_base['DCOLON']
-
-
-# debug.set_trace()

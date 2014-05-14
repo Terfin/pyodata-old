@@ -1,9 +1,15 @@
-import re
-import utils
+from service.servicecore import *
+from edm.edmtypes import *
+from edm.core import *
 from pdb import Pdb
 
 debug = Pdb()
-print utils.regex_base['primitiveLiteral']
-a = re.compile("^({})$".format(utils.regex_base['primitiveLiteral']))
-b= a.match('Collection(Point(+133%x20-133))')
+
+
+@servicemember
+class Foo(entity_base()):
+	key = 'foo'
+	__ename__ = 'MyFoo'
+	a = String("foo")
+
 debug.set_trace()

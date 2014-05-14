@@ -121,11 +121,3 @@ def gen_metadoc(entity_list):
 	[append_meta_node(entity) for entity in entity_list]
 	root.append(service_node)
 	return root
-
-
-class Foo(entity_base()):
-	key = 'foo'
-	__ename__ = 'MyFoo'
-	a = String("foo")
-
-debug.set_trace()
