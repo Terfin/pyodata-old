@@ -1,3 +1,6 @@
+**This repository is no longer maintained, I've decided to reboot the project with the help of two more members from Sela Group, see [new pyodata repository](https://github.com/pyodata/pyodata)**
+
+
 pyodata
 =======
 
